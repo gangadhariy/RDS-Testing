@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AWS RDS Explorer</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
+
+body{
+background:linear-gradient(-45deg,#0f172a,#1e293b,#0ea5e9,#9333ea);
+background-size:400% 400%;
+animation:bgMove 12s infinite alternate;
+color:white;
+overflow-x:hidden;
+}
+
+@keyframes bgMove{
+0%{background-position:0% 50%;}
+100%{background-position:100% 50%;}
+}
+
+header{
+padding:60px;
+text-align:center;
+}
+
+header h1{
+font-family:'Orbitron';
+font-size:3rem;
+animation:glow 2s infinite alternate;
+}
+
+@keyframes glow{
+from{text-shadow:0 0 10px cyan;}
+to{text-shadow:0 0 35px magenta;}
+}
+
+section{
+padding:50px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:25px;
+}
+
+.card{
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(15px);
+padding:25px;
+border-radius:20px;
+transition:.4s;
+animation:float 4s infinite ease-in-out;
+box-shadow:0 0 20px rgba(255,255,255,.2);
+}
+
+.card:hover{
+transform:scale(1.08) rotate(2deg);
+box-shadow:0 0 35px cyan;
+}
+
+@keyframes float{
+0%,100%{transform:translateY(0);}
+50%{transform:translateY(-15px);}
+}
+
+.card h3{
+color:#00ffff;
+margin-bottom:10px;
+}
+
+.form-box{
+max-width:700px;
+margin:auto;
+padding:35px;
+border-radius:20px;
+background:rgba(255,255,255,.1);
+backdrop-filter:blur(15px);
+animation:float 3s infinite;
+}
+
+input{
+width:100%;
+padding:15px;
+margin:12px 0;
+border:none;
+border-radius:12px;
+font-size:1rem;
+}
+
+button{
+width:100%;
+padding:15px;
+border:none;
+border-radius:15px;
+background:linear-gradient(90deg,cyan,magenta);
+font-size:1rem;
+font-weight:bold;
+cursor:pointer;
+transition:.3s;
+}
+
+button:hover{
+transform:scale(1.05);
+box-shadow:0 0 25px cyan;
+}
+
+#msg{
+margin-top:20px;
+text-align:center;
+font-size:1.2rem;
+color:#00ff9d;
+}
+</style>
+</head>
+<body>
+
+<header>
+<h1>AWS RDS Database Universe</h1>
+<p>Managed relational databases in AWS cloud</p>
+</header>
+
+<section>
+<h2>What is AWS RDS?</h2>
+<br>
+<p>
+Amazon RDS (Relational Database Service) is a managed cloud database platform.
+AWS handles provisioning, patching, backups, scaling, replication, failover, monitoring,
+and security while your application simply connects and stores data.
+</p>
+</section>
+
+<section>
+<h2>Supported Database Engines</h2>
+<br>
+
+<div class="grid">
+
+<div class="card">
+<h3>MySQL</h3>
+<p>Popular open-source relational DB</p>
+</div>
+
+<div class="card">
+<h3>PostgreSQL</h3>
+<p>Advanced object-relational DB</p>
+</div>
+
+<div class="card">
+<h3>MariaDB</h3>
+<p>MySQL-compatible enhanced engine</p>
+</div>
+
+<div class="card">
+<h3>Oracle</h3>
+<p>Enterprise-grade database</p>
+</div>
+
+<div class="card">
+<h3>SQL Server</h3>
+<p>Microsoft relational database</p>
+</div>
+
+<div class="card">
+<h3>Aurora</h3>
+<p>AWS high-performance cloud-native DB</p>
+</div>
+
+</div>
+</section>
+
+<section>
+<h2>Insert User Data into RDS</h2>
+<br>
+
+<div class="form-box">
+
+<input type="text" id="name" placeholder="Enter Name">
+<input type="number" id="age" placeholder="Enter Age">
+<input type="text" id="country" placeholder="Enter Country">
+
+<button onclick="saveData()">Save to AWS RDS</button>
+
+<div id="msg"></div>
+
+</div>
+</section>
+
+<script>
+async function saveData(){
+
+const name=document.getElementById("name").value;
+const age=document.getElementById("age").value;
+const country=document.getElementById("country").value;
+
+const res=await fetch('/save',{
+method:'POST',
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify({name,age,country})
+});
+
+const data=await res.json();
+
+document.getElementById("msg").innerHTML=data.message;
+}
+</script>
+
+</body>
+</html>
