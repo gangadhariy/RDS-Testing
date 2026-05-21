@@ -4,28 +4,25 @@ import os
 
 app = Flask(__name__)
 
-# ==========================
-# AWS RDS MySQL CONFIG
-# ==========================
 DB_HOST = os.getenv("DB_HOST")
 DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_NAME = os.getenv("DB_NAME")
 
-# ==========================
-# CONNECT TO MYSQL
-# ==========================
-connection = pymysql.connect(
-    host=DB_HOST,
-    user=DB_USER,
-    password=DB_PASSWORD,
-    database=DB_NAME,
-    cursorclass=pymysql.cursors.DictCursor
-)
+
+def get_connection():
+    return pymysql.connect(
+        host=DB_HOST,
+        user=DB_USER,
+        password=DB_PASSWORD,
+        database=DB_NAME,
+        cursorclass=pymysql.cursors.DictCursor
+    )
 
 
 def create_table():
-    with connection.cursor() as cursor:
+    conn = get_connection()
+    with conn.cursor() as cursor:
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS users (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -34,7 +31,8 @@ def create_table():
                 country VARCHAR(100)
             )
         """)
-    connection.commit()
+    conn.commit()
+    conn.close()
 
 
 create_table()
@@ -45,20 +43,61 @@ def home():
     return render_template("index.html")
 
 
+@app.route("/users", methods=["GET"])
+def users():
+    conn = get_connection()
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT * FROM users")
+        data = cursor.fetchall()
+    conn.close()
+    return jsonify(data)
+
+
 @app.route("/save", methods=["POST"])
 def save():
     data = request.json
-    name = data["name"]
-    age = data["age"]
-    country = data["country"]
+    conn = get_connection()
 
-    with connection.cursor() as cursor:
-        sql = "INSERT INTO users (name, age, country) VALUES (%s, %s, %s)"
-        cursor.execute(sql, (name, age, country))
+    with conn.cursor() as cursor:
+        cursor.execute(
+            "INSERT INTO users (name, age, country) VALUES (%s,%s,%s)",
+            (data["name"], data["age"], data["country"])
+        )
 
-    connection.commit()
+    conn.commit()
+    conn.close()
 
-    return jsonify({"message": "Saved successfully to AWS RDS 🚀"})
+    return jsonify({"message": "User Created Successfully 🚀"})
+
+
+@app.route("/update/<int:id>", methods=["PUT"])
+def update(id):
+    data = request.json
+    conn = get_connection()
+
+    with conn.cursor() as cursor:
+        cursor.execute(
+            "UPDATE users SET name=%s, age=%s, country=%s WHERE id=%s",
+            (data["name"], data["age"], data["country"], id)
+        )
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({"message": "User Updated Successfully ✨"})
+
+
+@app.route("/delete/<int:id>", methods=["DELETE"])
+def delete(id):
+    conn = get_connection()
+
+    with conn.cursor() as cursor:
+        cursor.execute("DELETE FROM users WHERE id=%s", (id,))
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({"message": "User Deleted Successfully ❌"})
 
 
 if __name__ == "__main__":
