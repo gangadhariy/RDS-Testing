@@ -1,217 +1,255 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>AWS RDS Explorer</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+<title>AWS RDS Pro Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&family=Poppins:wght@300;600&display=swap" rel="stylesheet">
 
 <style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:'Poppins',sans-serif;
-}
-
+*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins}
 body{
-background:linear-gradient(-45deg,#0f172a,#1e293b,#0ea5e9,#9333ea);
-background-size:400% 400%;
-animation:bgMove 12s infinite alternate;
-color:white;
-overflow-x:hidden;
+background:linear-gradient(135deg,#020617,#0f172a,#312e81);
+color:white;overflow-x:hidden
 }
 
-@keyframes bgMove{
-0%{background-position:0% 50%;}
-100%{background-position:100% 50%;}
+nav{
+display:flex;justify-content:center;gap:30px;
+padding:20px;background:#111827
+}
+nav button{
+padding:14px 28px;
+border:none;border-radius:15px;
+cursor:pointer;font-weight:bold;
+background:linear-gradient(45deg,cyan,magenta);
+transition:.4s;
+}
+nav button:hover{
+transform:scale(1.1);
+box-shadow:0 0 20px cyan;
 }
 
-header{
-padding:60px;
-text-align:center;
-}
+.page{display:none;padding:50px}
+.active{display:block}
 
-header h1{
-font-family:'Orbitron';
+h1{
+font-family:Orbitron;
 font-size:3rem;
-animation:glow 2s infinite alternate;
+text-align:center;
+margin-bottom:30px;
+animation:glow 2s infinite alternate
 }
 
 @keyframes glow{
-from{text-shadow:0 0 10px cyan;}
-to{text-shadow:0 0 35px magenta;}
-}
-
-section{
-padding:50px;
-}
-
-.grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-gap:25px;
+from{text-shadow:0 0 10px cyan}
+to{text-shadow:0 0 35px magenta}
 }
 
 .card{
-background:rgba(255,255,255,0.08);
+background:rgba(255,255,255,.08);
 backdrop-filter:blur(15px);
 padding:25px;
 border-radius:20px;
+margin:20px;
+animation:float 4s infinite;
 transition:.4s;
-animation:float 4s infinite ease-in-out;
-box-shadow:0 0 20px rgba(255,255,255,.2);
 }
 
 .card:hover{
-transform:scale(1.08) rotate(2deg);
-box-shadow:0 0 35px cyan;
+transform:scale(1.05);
+box-shadow:0 0 30px cyan;
 }
 
 @keyframes float{
-0%,100%{transform:translateY(0);}
-50%{transform:translateY(-15px);}
-}
-
-.card h3{
-color:#00ffff;
-margin-bottom:10px;
-}
-
-.form-box{
-max-width:700px;
-margin:auto;
-padding:35px;
-border-radius:20px;
-background:rgba(255,255,255,.1);
-backdrop-filter:blur(15px);
-animation:float 3s infinite;
+50%{transform:translateY(-10px)}
 }
 
 input{
 width:100%;
 padding:15px;
-margin:12px 0;
-border:none;
-border-radius:12px;
-font-size:1rem;
+margin:10px 0;
+border:none;border-radius:15px
 }
 
-button{
+.action-btn{
 width:100%;
 padding:15px;
 border:none;
 border-radius:15px;
-background:linear-gradient(90deg,cyan,magenta);
-font-size:1rem;
+background:linear-gradient(45deg,#00f5ff,#ff00ff);
+color:white;
 font-weight:bold;
 cursor:pointer;
-transition:.3s;
+transition:.4s
 }
 
-button:hover{
-transform:scale(1.05);
-box-shadow:0 0 25px cyan;
+.action-btn:hover{
+transform:scale(1.05)
 }
 
-#msg{
-margin-top:20px;
+#usersGrid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:25px
+}
+
+.user-card{
+padding:25px;
+border-radius:20px;
+background:linear-gradient(135deg,#1e3a8a,#7c3aed);
+animation:pop .6s
+}
+
+@keyframes pop{
+from{transform:scale(.5);opacity:0}
+to{transform:scale(1);opacity:1}
+}
+
+.success{
 text-align:center;
+color:#00ff88;
 font-size:1.2rem;
-color:#00ff9d;
+margin-top:15px;
+animation:pop .6s
 }
 </style>
 </head>
 <body>
 
-<header>
-<h1>AWS RDS Database Universe</h1>
-<p>Managed relational databases in AWS cloud</p>
-</header>
+<nav>
+<button onclick="showPage('home')">RDS Info</button>
+<button onclick="showPage('manage')">Manage Users</button>
+<button onclick="loadUsers()">Search Users</button>
+</nav>
 
-<section>
+<div id="home" class="page active">
+<h1>AWS RDS Professional Explorer</h1>
+
+<div class="card">
 <h2>What is AWS RDS?</h2>
-<br>
 <p>
-Amazon RDS (Relational Database Service) is a managed cloud database platform.
-AWS handles provisioning, patching, backups, scaling, replication, failover, monitoring,
-and security while your application simply connects and stores data.
+Amazon RDS is a fully managed relational database service.
+It automates provisioning, backups, scaling, monitoring,
+replication, patching and failover.
 </p>
-</section>
-
-<section>
-<h2>Supported Database Engines</h2>
-<br>
-
-<div class="grid">
-
-<div class="card">
-<h3>MySQL</h3>
-<p>Popular open-source relational DB</p>
 </div>
 
 <div class="card">
-<h3>PostgreSQL</h3>
-<p>Advanced object-relational DB</p>
-</div>
-
-<div class="card">
-<h3>MariaDB</h3>
-<p>MySQL-compatible enhanced engine</p>
-</div>
-
-<div class="card">
-<h3>Oracle</h3>
-<p>Enterprise-grade database</p>
-</div>
-
-<div class="card">
-<h3>SQL Server</h3>
-<p>Microsoft relational database</p>
-</div>
-
-<div class="card">
-<h3>Aurora</h3>
-<p>AWS high-performance cloud-native DB</p>
+<h2>Supported Databases</h2>
+<p>MySQL • PostgreSQL • MariaDB • Oracle • SQL Server • Aurora</p>
 </div>
 
 </div>
-</section>
 
-<section>
-<h2>Insert User Data into RDS</h2>
-<br>
+<div id="manage" class="page">
 
-<div class="form-box">
+<h1>Manage Database Users</h1>
 
-<input type="text" id="name" placeholder="Enter Name">
-<input type="number" id="age" placeholder="Enter Age">
-<input type="text" id="country" placeholder="Enter Country">
+<input id="name" placeholder="Name">
+<input id="age" placeholder="Age">
+<input id="country" placeholder="Country">
 
-<button onclick="saveData()">Save to AWS RDS</button>
+<button class="action-btn" onclick="saveUser()">Create User</button>
 
 <div id="msg"></div>
 
+<br><br>
+
+<div id="usersGrid"></div>
+
 </div>
-</section>
 
 <script>
-async function saveData(){
 
-const name=document.getElementById("name").value;
-const age=document.getElementById("age").value;
-const country=document.getElementById("country").value;
+let editId=null
 
-const res=await fetch('/save',{
-method:'POST',
+function showPage(page){
+document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'))
+document.getElementById(page).classList.add('active')
+}
+
+async function saveUser(){
+
+const name=nameInput()
+const age=ageInput()
+const country=countryInput()
+
+let url='/save'
+let method='POST'
+
+if(editId){
+url='/update/'+editId
+method='PUT'
+}
+
+const res=await fetch(url,{
+method,
 headers:{'Content-Type':'application/json'},
 body:JSON.stringify({name,age,country})
-});
+})
 
-const data=await res.json();
-
-document.getElementById("msg").innerHTML=data.message;
+const data=await res.json()
+msg(data.message)
+clearForm()
+loadUsers()
+editId=null
 }
+
+async function loadUsers(){
+
+showPage('manage')
+
+const res=await fetch('/users')
+const users=await res.json()
+
+let html=''
+
+users.forEach(u=>{
+html+=`
+<div class="user-card">
+<h3>${u.name}</h3>
+<p>Age: ${u.age}</p>
+<p>${u.country}</p>
+<br>
+<button class="action-btn" onclick="editUser(${u.id},'${u.name}',${u.age},'${u.country}')">Update</button>
+<br><br>
+<button class="action-btn" onclick="deleteUser(${u.id})">Delete</button>
+</div>
+`
+})
+
+document.getElementById('usersGrid').innerHTML=html
+}
+
+function editUser(id,name,age,country){
+editId=id
+document.getElementById('name').value=name
+document.getElementById('age').value=age
+document.getElementById('country').value=country
+msg("Editing user ✨")
+}
+
+async function deleteUser(id){
+await fetch('/delete/'+id,{method:'DELETE'})
+msg("Deleted Successfully ❌")
+loadUsers()
+}
+
+function msg(text){
+document.getElementById('msg').innerHTML=
+`<div class="success">${text}</div>`
+}
+
+function clearForm(){
+document.getElementById('name').value=''
+document.getElementById('age').value=''
+document.getElementById('country').value=''
+}
+
+function nameInput(){return document.getElementById('name').value}
+function ageInput(){return document.getElementById('age').value}
+function countryInput(){return document.getElementById('country').value}
+
+loadUsers()
+
 </script>
 
 </body>
