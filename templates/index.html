@@ -1,254 +1,261 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>AWS RDS Pro Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+<title>AWS RDS Dashboard</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins}
 body{
+margin:0;
+font-family:Poppins;
 background:linear-gradient(135deg,#020617,#0f172a,#312e81);
-color:white;overflow-x:hidden
+color:white;
 }
 
 nav{
-display:flex;justify-content:center;gap:30px;
-padding:20px;background:#111827
-}
-nav button{
-padding:14px 28px;
-border:none;border-radius:15px;
-cursor:pointer;font-weight:bold;
-background:linear-gradient(45deg,cyan,magenta);
-transition:.4s;
-}
-nav button:hover{
-transform:scale(1.1);
-box-shadow:0 0 20px cyan;
+display:flex;
+justify-content:center;
+gap:20px;
+padding:20px;
+background:#111827;
 }
 
-.page{display:none;padding:50px}
-.active{display:block}
+nav button{
+padding:16px 40px;
+border:none;
+border-radius:18px;
+background:linear-gradient(90deg,cyan,magenta);
+color:white;
+font-weight:bold;
+cursor:pointer;
+}
+
+.section{
+padding:60px;
+display:none;
+}
+
+.active{display:block;}
 
 h1{
 font-family:Orbitron;
-font-size:3rem;
 text-align:center;
-margin-bottom:30px;
-animation:glow 2s infinite alternate
-}
-
-@keyframes glow{
-from{text-shadow:0 0 10px cyan}
-to{text-shadow:0 0 35px magenta}
-}
-
-.card{
-background:rgba(255,255,255,.08);
-backdrop-filter:blur(15px);
-padding:25px;
-border-radius:20px;
-margin:20px;
-animation:float 4s infinite;
-transition:.4s;
-}
-
-.card:hover{
-transform:scale(1.05);
-box-shadow:0 0 30px cyan;
-}
-
-@keyframes float{
-50%{transform:translateY(-10px)}
+font-size:3rem;
+text-shadow:0 0 20px cyan;
 }
 
 input{
 width:100%;
-padding:15px;
-margin:10px 0;
-border:none;border-radius:15px
-}
-
-.action-btn{
-width:100%;
-padding:15px;
+padding:18px;
+margin:12px 0;
 border:none;
 border-radius:15px;
-background:linear-gradient(45deg,#00f5ff,#ff00ff);
+font-size:1rem;
+}
+
+.mainbtn{
+width:100%;
+padding:18px;
+border:none;
+border-radius:18px;
+background:linear-gradient(90deg,#06b6d4,#d946ef);
 color:white;
 font-weight:bold;
 cursor:pointer;
-transition:.4s
 }
 
-.action-btn:hover{
-transform:scale(1.05)
-}
-
-#usersGrid{
+.grid{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-gap:25px
+gap:20px;
+margin-top:30px;
 }
 
-.user-card{
-padding:25px;
-border-radius:20px;
-background:linear-gradient(135deg,#1e3a8a,#7c3aed);
-animation:pop .6s
+.card{
+background:rgba(255,255,255,.08);
+padding:20px;
+border-radius:18px;
+backdrop-filter:blur(10px);
+animation:float 3s infinite ease-in-out;
 }
 
-@keyframes pop{
-from{transform:scale(.5);opacity:0}
-to{transform:scale(1);opacity:1}
+@keyframes float{
+50%{transform:translateY(-10px);}
 }
 
-.success{
-text-align:center;
-color:#00ff88;
-font-size:1.2rem;
-margin-top:15px;
-animation:pop .6s
+.popup{
+position:fixed;
+top:20px;
+right:20px;
+padding:20px;
+border-radius:14px;
+display:none;
+font-weight:bold;
+z-index:999;
+}
+
+.search-item{
+background:#1e293b;
+padding:16px;
+border-radius:12px;
+margin:10px 0;
 }
 </style>
 </head>
 <body>
 
+<div class="popup" id="popup"></div>
+
 <nav>
-<button onclick="showPage('home')">RDS Info</button>
-<button onclick="showPage('manage')">Manage Users</button>
-<button onclick="loadUsers()">Search Users</button>
+<button onclick="showTab('rds')">RDS Info</button>
+<button onclick="showTab('manage')">Manage Users</button>
+<button onclick="showTab('search')">Search Users</button>
 </nav>
 
-<div id="home" class="page active">
-<h1>AWS RDS Professional Explorer</h1>
-
-<div class="card">
-<h2>What is AWS RDS?</h2>
-<p>
-Amazon RDS is a fully managed relational database service.
-It automates provisioning, backups, scaling, monitoring,
-replication, patching and failover.
+<div id="rds" class="section active">
+<h1>AWS RDS</h1>
+<p style="text-align:center;font-size:20px;">
+Amazon RDS manages MySQL, PostgreSQL, Oracle,
+MariaDB, SQL Server and Aurora with automated
+backups, scaling, replication and security.
 </p>
 </div>
 
-<div class="card">
-<h2>Supported Databases</h2>
-<p>MySQL • PostgreSQL • MariaDB • Oracle • SQL Server • Aurora</p>
+<div id="manage" class="section">
+<h1>Manage Users</h1>
+
+<input id="name" placeholder="Enter Name">
+<input id="age" placeholder="Enter Age">
+<input id="country" placeholder="Enter Country">
+
+<button class="mainbtn" onclick="saveUser()">Create / Update User</button>
+
+<div class="grid" id="users"></div>
 </div>
 
-</div>
+<div id="search" class="section">
+<h1>Search Users</h1>
 
-<div id="manage" class="page">
+<input id="searchBox" placeholder="Type user name..." onkeyup="searchUser()">
 
-<h1>Manage Database Users</h1>
-
-<input id="name" placeholder="Name">
-<input id="age" placeholder="Age">
-<input id="country" placeholder="Country">
-
-<button class="action-btn" onclick="saveUser()">Create User</button>
-
-<div id="msg"></div>
-
-<br><br>
-
-<div id="usersGrid"></div>
-
+<div id="searchResults"></div>
 </div>
 
 <script>
 
-let editId=null
+let selectedId=null;
 
-function showPage(page){
-document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'))
-document.getElementById(page).classList.add('active')
+function popup(msg,color){
+let p=document.getElementById("popup");
+p.innerHTML=msg;
+p.style.background=color;
+p.style.display="block";
+setTimeout(()=>p.style.display="none",3000);
+}
+
+function showTab(tab){
+document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+document.getElementById(tab).classList.add('active');
+if(tab==="manage") loadUsers();
 }
 
 async function saveUser(){
 
-const name=nameInput()
-const age=ageInput()
-const country=countryInput()
+const userName=document.getElementById("name").value.trim();
+const userAge=document.getElementById("age").value.trim();
+const userCountry=document.getElementById("country").value.trim();
 
-let url='/save'
-let method='POST'
+let route='/save';
+let method='POST';
 
-if(editId){
-url='/update/'+editId
-method='PUT'
+if(selectedId){
+route=`/update/${selectedId}`;
+method='PUT';
 }
 
-const res=await fetch(url,{
-method,
+const res=await fetch(route,{
+method:method,
 headers:{'Content-Type':'application/json'},
-body:JSON.stringify({name,age,country})
+body:JSON.stringify({
+name:userName,
+age:userAge,
+country:userCountry
 })
+});
 
-const data=await res.json()
-msg(data.message)
-clearForm()
-loadUsers()
-editId=null
+const data=await res.json();
+
+if(res.ok){
+popup(data.message,"green");
+loadUsers();
+selectedId=null;
+}else{
+popup(data.error,"red");
+}
 }
 
 async function loadUsers(){
+let res=await fetch('/users');
+let users=await res.json();
 
-showPage('manage')
-
-const res=await fetch('/users')
-const users=await res.json()
-
-let html=''
+let html='';
 
 users.forEach(u=>{
 html+=`
-<div class="user-card">
-<h3>${u.name}</h3>
+<div class="card">
+<h2>${u.name}</h2>
 <p>Age: ${u.age}</p>
 <p>${u.country}</p>
-<br>
-<button class="action-btn" onclick="editUser(${u.id},'${u.name}',${u.age},'${u.country}')">Update</button>
+<button class="mainbtn" onclick="editUser(${u.id},'${u.name}',${u.age},'${u.country}')">Update</button>
 <br><br>
-<button class="action-btn" onclick="deleteUser(${u.id})">Delete</button>
-</div>
-`
-})
+<button class="mainbtn" onclick="deleteUser(${u.id})">Delete</button>
+</div>`;
+});
 
-document.getElementById('usersGrid').innerHTML=html
+document.getElementById('users').innerHTML=html;
 }
 
-function editUser(id,name,age,country){
-editId=id
-document.getElementById('name').value=name
-document.getElementById('age').value=age
-document.getElementById('country').value=country
-msg("Editing user ✨")
+function editUser(id,n,a,c){
+selectedId=id;
+document.getElementById("name").value=n;
+document.getElementById("age").value=a;
+document.getElementById("country").value=c;
+popup("Editing User","orange");
 }
 
 async function deleteUser(id){
-await fetch('/delete/'+id,{method:'DELETE'})
-msg("Deleted Successfully ❌")
-loadUsers()
+let res=await fetch(`/delete/${id}`,{method:'DELETE'});
+let data=await res.json();
+popup(data.message,"red");
+loadUsers();
 }
 
-function msg(text){
-document.getElementById('msg').innerHTML=
-`<div class="success">${text}</div>`
+async function searchUser(){
+
+const q=document.getElementById("searchBox").value;
+
+if(!q){
+document.getElementById("searchResults").innerHTML="";
+return;
 }
 
-function clearForm(){
-document.getElementById('name').value=''
-document.getElementById('age').value=''
-document.getElementById('country').value=''
+let res=await fetch(`/search/${q}`);
+let users=await res.json();
+
+let html='';
+
+users.forEach(u=>{
+html+=`
+<div class="search-item">
+${u.name} | Age: ${u.age} | ${u.country}
+</div>`;
+});
+
+document.getElementById("searchResults").innerHTML=html;
 }
 
-function nameInput(){return document.getElementById('name').value}
-function ageInput(){return document.getElementById('age').value}
-function countryInput(){return document.getElementById('country').value}
-
-loadUsers()
+loadUsers();
 
 </script>
 
